@@ -1,0 +1,55 @@
+Simple first CPU
+================
+
+ALU Functions:
+	0 -> Passthrough
+	1 -> Add
+	2 -> NAND
+	3 -> Inversion
+
+Registers:
+	A (8bit Accumulator)
+	C (Carry)
+	P (Program Counter)
+
+	EA (Effective Address, Internal)
+
+Instruction Format:
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |         A   D   D   R         |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Instruction: (and opcodes)
+	R:	Read from Memory	0x02
+	A:	Add			0x06
+	N:	NAND			0x0A
+	I:	Inversion (NOT)		0x0E
+	W:	Write to Memory		0x01
+	JP:	Unconditional Jump	0x30
+	JC:	Jump if C isn't set	0x20
+	NOP:	No-op			0x00
+	H:	Halt			0x40 0x40
+
+Notes:
+	1.	C (Carry) will always be set if current data + A overflows
+	2.	JC doesn't unset C
+
+Control State:
+	LDI:	Load Opcode		(RDI, P_UPD, ADDR_SEL)
+	JMP:	Load EA, Try Jump	(RD_EA, P_UPD, P_JMP, ADDR_SEL)
+	ALU:	Read, update A, C	(A_WR, IOMEM)
+	MWR:	Write to Memory		(MWR, IOMEM)
+
+Op-code format:
+  7   6   5   4   3   2   1   0
++---+---+---+---+---+---+---+---+
+| I | H | J | C | ALU_F | U | W |
++---+---+---+---+---+---+---+---+
+
+	I:	Use I/O memory
+	H:	Halt
+	J:	Type of instruction (Normal or Jump)
+	C:	Conditional Jump (If 1, unconditional)
+	ALU_F:	ALU Fuctions
+	U:	write to A
+	W:	write to Memory
