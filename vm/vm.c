@@ -111,6 +111,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 				regs->ea = mem[regs->p];
 				break;
 			case CYCL_IND_JMP:
+				regs->p++; /* advance P first */
 				if(regs->i.jump)
 				{
 					if(regs->i.jc)
@@ -121,8 +122,6 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					{
 						if(!(regs->a & C_MASK)) /* Jump if C is not set */
 							regs->p = regs->i.ind ? mem[regs->ea] : regs->ea;
-						else
-							regs->p++; /* No jump performed, advance P */
 					}
 				}
 				else if(regs->i.ind)
