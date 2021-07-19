@@ -20,36 +20,37 @@ Instruction Format:
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Instruction: (and opcodes)
-	R:	Read from Memory	0x02
-	A:	Add			0x06
-	N:	NAND			0x0A
-	I:	Inversion (NOT)		0x0E
+	R:	Read from Memory	0x00
+	A:	Add			0x04
+	N:	NAND			0x08
+	I:	Inversion (NOT)		0x0C
 	W:	Write to Memory		0x01
 	JP:	Unconditional Jump	0x30
 	JC:	Jump if C isn't set	0x20
-	NOP:	No-op			0x00
-	H:	Halt			0x40 0x40
+	H:	Halt			0x40
+
+	...etc, there're many more combinations that have potiential use.
 
 Notes:
 	1.	C (Carry) will always be set if current data + A overflows
 	2.	JC doesn't unset C
 
 Control State:
-	LDI:	Load Opcode		(RDI, P_UPD, ADDR_SEL)
-	JMP:	Load EA, Try Jump	(RD_EA, P_UPD, P_JMP, ADDR_SEL)
-	ALU:	Read, update A, C	(A_WR, IOMEM)
-	MWR:	Write to Memory		(MWR, IOMEM)
+	1:	Load Opcode				(ADDR_SEL, RDI, P_UPD)
+	2:	Load Effective Address			(ADDR_SEL, RD_EA)
+	3:	Load Indirect, Try Jump			(RD_EA (Read Indirect Address), P_UPD, P_JMP)
+	4:	Memory Read / Write, ALU operation	(A_W / MWR, IOMEM)
 
 Op-code format:
   7   6   5   4   3   2   1   0
 +---+---+---+---+---+---+---+---+
-| I | H | J | C | ALU_F | U | W |
+|IOM| H | J | C | ALU_F | I |R/W|
 +---+---+---+---+---+---+---+---+
 
-	I:	Use I/O memory
+	IOM:	Use I/O memory
 	H:	Halt
 	J:	Type of instruction (Normal or Jump)
 	C:	Conditional Jump (If 1, unconditional)
 	ALU_F:	ALU Fuctions
-	U:	write to A
-	W:	write to Memory
+	I:	Indirect Access
+	R/W:	Read / Write to Memory
