@@ -25,10 +25,10 @@ extern pc_t pc;
 #define JC_MASK		0x10
 #define IND_MASK	0x02
 #define RW_MASK		0x01
-#define GET_ALU(x)	((x & 0xC0) >> 2)
+#define GET_ALU(x)	(((x) & 0x0C) >> 2)
 #define C_MASK		0x100
 
-#define BITVAL(x)	(x ? 1 : 0)
+#define BITVAL(x)	((x) ? 1 : 0)
 
 struct instruction_s
 {

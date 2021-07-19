@@ -38,12 +38,12 @@ void dumpcore(mem_t *mem, size_t memsize, FILE *fd)
 }
 
 /* a should be A register value */
-int alu_calc(uint8_t func, mem_t a, mem_t b)
+uint16_t alu_calc(uint8_t func, mem_t a, mem_t b)
 {
 	switch(func)
 	{
 		case 0:
-			return a;
+			return b;
 			break;
 		case 1:
 			return b + a;
@@ -54,10 +54,9 @@ int alu_calc(uint8_t func, mem_t a, mem_t b)
 		case 3:
 			return ~b;
 			break;
-		default:
-			return -1;
-			break;
 	}
+	panic("?ALU");
+	return 0;
 }
 
 int readmem(pc_t addr, mem_t *mem, int iomem)
@@ -94,18 +93,26 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 	regs->in = in;
 	regs->out = out;
 
+	mem_t inst = 0;
+
 	while(halt == 0)
 	{
 		switch(regs->cycle % 4)
 		{
 			case CYCL_LOAD_INST:
+				inst = mem[regs->p];
 				regs->i.iomem = BITVAL(mem[regs->p] & IOMEM_MASK);
 				regs->i.halt  = BITVAL(mem[regs->p] &  HALT_MASK);
 				regs->i.jump  = BITVAL(mem[regs->p] &  JUMP_MASK);
 				regs->i.jc    = BITVAL(mem[regs->p] &    JC_MASK);
+				regs->i.alu   = GET_ALU(mem[regs->p]);
 				regs->i.ind   = BITVAL(mem[regs->p] &   IND_MASK);
 				regs->i.rw    = BITVAL(mem[regs->p++] &  RW_MASK);
-				if(regs->i.halt) halt = 1;
+				if(regs->i.halt)
+				{
+					halt = 1;
+					dumpcore(mem, MEMSIZE, out);
+				}
 				break;
 			case CYCL_LOAD_EA:
 				regs->ea = mem[regs->p];
@@ -128,26 +135,31 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					regs->ea = mem[regs->ea];
 				break;
 			case CYCL_RW_IO:
-				if(regs->i.rw)
-				{	/* Read */
-					regs->a = (state = readmem(regs->ea, mem, regs->i.iomem));
-					if(state < 0)
-						panic("?READMEM");
-				}
-				else
-				{	/* Write */
-					state = writemem(regs->ea, mem, regs->i.iomem, regs->a);
-					if(state < 0)
-						panic("?WRITEMEM");
+				if(regs->i.jump == 0)
+				{
+					if(regs->i.rw == 0)
+					{	/* Read */
+						regs->a = alu_calc(regs->i.alu, regs->a,
+								(state = readmem(regs->ea, mem, regs->i.iomem)));
+						if(state < 0)
+							panic("?READMEM");
+					}
+					else
+					{	/* Write */
+						state = writemem(regs->ea, mem, regs->i.iomem, regs->a);
+						if(state < 0)
+							panic("?WRITEMEM");
+					}
 				}
 				break;
 		}
 		
 		if(debug)
 		{
-			fprintf(stderr, ">> cycle %zu -> %zu, A = %04hx, P = %02hhx, EA = %02hhx\n",
-					regs->cycle, regs->cycle % 4, regs->a, regs->p, regs->ea);
+			fprintf(stderr, ">> cycle %zu -> %zu, I = %02hhx A = %04hx, P = %02hhx, EA = %02hhx MEM[EA] = %02hhx\n",
+					regs->cycle, regs->cycle % 4, inst, regs->a, regs->p, regs->ea, mem[regs->ea]);
 		}
+
 		regs->cycle++;
 	}
 }
