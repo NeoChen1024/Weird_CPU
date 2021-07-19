@@ -3,5 +3,5 @@ This is a simple proof of concept CPU made solely by myself.
 There might be still some bugs floating around.
 
 ## Todo:
-1. Emulator in C
+1. Emulator in C (WIP)
 2. Assembler
