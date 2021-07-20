@@ -9,6 +9,7 @@ ALU Functions:
 
 Registers: (and Bits)
 	8 -> A (Accumulator)
+	8 -> U (Upper)
 	1 -> C (Carry)
 	16-> P (Program Counter)
 
@@ -44,13 +45,17 @@ Control State:
 Op-code format:
   7   6   5   4   3   2   1   0
 +---+---+---+---+---+---+---+---+
-|IOM| Z | J | C | ALU_F | I |R/W|
+|IOM| Z | J |C/U| ALU_F | I |R/W|
 +---+---+---+---+---+---+---+---+
 
 	IOM:	Use I/O memory
 	Z:	if 1, Zero Page
 	J:	Type of instruction (Normal or Jump)
-	C:	Conditional Jump (If 1, unconditional)
+	C/U:	Conditional Jump or select U register
 	ALU_F:	ALU Fuctions
 	I:	Indirect Access
 	R/W:	Read / Write to Memory
+
+Addressing Mode:
+	Now it's a little too complicated, hard to explain.
+	Maybe wait for the design to settle down.
