@@ -7,12 +7,12 @@ ALU Functions:
 	2 -> NAND
 	3 -> Inversion
 
-Registers:
-	A (8bit Accumulator)
-	C (Carry)
-	P (Program Counter)
+Registers: (and Bits)
+	8 -> A (Accumulator)
+	1 -> C (Carry)
+	16-> P (Program Counter)
 
-	EA (Effective Address, Internal)
+	16-> EA (Effective Address, Internal)
 
 Instruction Format:
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -44,11 +44,11 @@ Control State:
 Op-code format:
   7   6   5   4   3   2   1   0
 +---+---+---+---+---+---+---+---+
-|IOM| H | J | C | ALU_F | I |R/W|
+|IOM| Z | J | C | ALU_F | I |R/W|
 +---+---+---+---+---+---+---+---+
 
 	IOM:	Use I/O memory
-	H:	Halt
+	Z:	if 1, Zero Page
 	J:	Type of instruction (Normal or Jump)
 	C:	Conditional Jump (If 1, unconditional)
 	ALU_F:	ALU Fuctions
