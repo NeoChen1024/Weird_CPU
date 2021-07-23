@@ -28,13 +28,14 @@ Instruction: (and opcodes)
 	W:	Write to Memory		0x01
 	JP:	Unconditional Jump	0x30
 	JC:	Jump if C isn't set	0x20
-	H:	Halt			0x40
+	H:	Halt			0x80 0x00
 
 	...etc, there're many more combinations that have potiential use.
 
 Notes:
-	1.	C (Carry) will always be set if current data + A overflows
+	1.	C (Carry) will always be set if current data + A overflows (even if using U)
 	2.	JC doesn't unset C
+	3.	ALU operation on U register uses value from A
 
 Control State:
 	1:	Load Opcode				(ADDR_SEL, RDI, P_UPD)
@@ -57,5 +58,18 @@ Op-code format:
 	R/W:	Read / Write to Memory
 
 Addressing Mode:
-	Now it's a little too complicated, hard to explain.
-	Maybe wait for the design to settle down.
+
+(PH = P & 0xFF00)
+
++-------+-------+-------+-----------------------------------------------+
+|J	|Z	|I	|Actual Effect					|
++-------+-------+-------+-----------------------------------------------+
+|X	|X	|X	|EA <-	PH + ADDR				|
+|X	|X	|O	|EA <-	PH + MEM(PH + ADDR)			|
+|X	|O	|X	|EA <-	0 + ADDR)				|
+|X	|O	|O	|EA <-	0 + MEM(PH + ADDR)			|
+|O	|X	|X	|P <-	PH + ADDR				|
+|O	|X	|O	|P <-	PH + MEM(PH + ADDR)			|
+|O	|O	|X	|P <-	0 + ADDR)				|
+|O	|O	|O	|P <-	0 + MEM(PH + ADDR)			|
++-------+-------+-------+-----------------------------------------------+
