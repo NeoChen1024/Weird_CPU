@@ -1,6 +1,6 @@
-/* ========= *\
-|| NeoSUBLEQ ||
-\* ========= */
+/* ====================== *\
+|| Weird CPU ISA Emulator ||
+\* ====================== */
 
 /* subleq.h: Common Header */
 
@@ -9,33 +9,39 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdarg.h>
 
-#define MEMSIZE	256
+#define IOMEMSIZE	(1<<8)
+#define MEMSIZE		(1<<16)
 
 typedef uint8_t mem_t;
-typedef uint8_t pc_t;
+typedef uint16_t pc_t;
 
 extern mem_t *mem;
 extern pc_t pc;
 
+#define TRUE	-1
+#define FALSE	0
+
 /* Define instruction bitmasks */
 #define IOMEM_MASK	0x80
-#define HALT_MASK	0x40
+#define ZP_MASK		0x40
 #define JUMP_MASK	0x20
-#define JC_MASK		0x10
+#define JCU_MASK	0x10
 #define IND_MASK	0x02
 #define RW_MASK		0x01
 #define GET_ALU(x)	(((x) & 0x0C) >> 2)
 #define C_MASK		0x100
 
 #define BITVAL(x)	((x) ? 1 : 0)
+#define IOMEM(x)	((x) & 0xFF)
 
 struct instruction_s
 {
 	uint8_t iomem	:1;	/* Use I/O memory space */
-	uint8_t halt	:1;	/* Halt execution */
+	uint8_t zp	:1;	/* Zero Page Addressing */
 	uint8_t jump	:1;	/* Perform jump */
-	uint8_t jc	:1;	/* if 1, unconditionally */
+	uint8_t jcu	:1;	/* Unconditional Jump or select U register */
 	uint8_t alu	:2;	/* ALU functions */
 	uint8_t ind	:1;	/* Indirect addressing */
 	uint8_t rw	:1;	/* 0 -> Read / 1 -> Write */
@@ -43,7 +49,9 @@ struct instruction_s
 
 typedef struct
 {
-	uint16_t a;
+	uint8_t a;
+	uint8_t u;
+	uint8_t c;	/* Only use 1 bit */
 	struct instruction_s i;
 	pc_t p;
 	pc_t ea;
@@ -60,7 +68,23 @@ enum cpu_cycle
 	CYCL_RW_IO	= 3
 };
 
-void panic(char *msg);
+enum io_return
+{
+	IO_HALT	= -1,
+	IO_ERR	= -2
+};
+
+#define IO_READ  0
+#define IO_WRITE 1
+
+typedef int (*io_handler_t)(int rw, uint8_t addr, uint8_t data);
+
+extern io_handler_t io_handler[IOMEMSIZE];
+
+#define DEF_IO_HANDLER(x) \
+	int io_ ## x(int rw, uint8_t addr, uint8_t data)
+
+void panic(char *fmt, ...);
 void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FILE *out);
 pc_t readcore(mem_t *mem, size_t memsize, FILE *fd);
 void dumpcore(mem_t *mem, size_t memsize, FILE *fd);

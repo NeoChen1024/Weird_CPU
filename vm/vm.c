@@ -1,6 +1,6 @@
-/* ========= *\
-|| NeoSUBLEQ ||
-\* ========= */
+/* ====================== *\
+|| Weird CPU ISA Emulator ||
+\* ====================== */
 
 /* vm.c: Virtual Machine Backend */
 
@@ -8,12 +8,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <weirdcpu.h>
+#include "weirdcpu.h"
 
-void panic(char *msg)
+io_handler_t io_handler[IOMEMSIZE];
+
+void panic(char *fmt, ...)
 {
-	fputs(msg, stderr);
-	exit(100);
+	va_list args;
+	va_start (args, fmt);
+	vfprintf(stderr, fmt, args);
+	va_end(args);
+	exit(1);
+}
+
+void debug_info(int debug, char *fmt, ...)
+{
+	va_list args;
+	va_start (args, fmt);
+	if(debug)
+		vfprintf(stderr, fmt, args);
+	va_end(args);
 }
 
 pc_t readcore(mem_t *mem, size_t memsize, FILE *fd)
@@ -59,11 +73,27 @@ uint16_t alu_calc(uint8_t func, mem_t a, mem_t b)
 	return 0;
 }
 
+/* MMIO handlers */
+
+DEF_IO_HANDLER(halt)
+{
+	return IO_HALT;
+}
+
 int readmem(pc_t addr, mem_t *mem, int iomem)
 {
+	int ret = 0;
+
 	if(iomem)
 	{
-		return -1;
+		if(io_handler[IOMEM(addr)] != NULL)
+		{
+			ret = io_handler[IOMEM(addr)](IO_READ, IOMEM(addr), 0);
+			if(ret == IO_ERR)
+				panic("?IO_ERR: READ addr = %hhx", IOMEM(addr));
+		}
+
+		return ret;
 	}
 	else
 	{
@@ -73,9 +103,18 @@ int readmem(pc_t addr, mem_t *mem, int iomem)
 
 int writemem(pc_t addr, mem_t *mem, int iomem, mem_t data)
 {
+	int ret = 0;
+
 	if(iomem)
 	{
-		return -1;
+		if(io_handler[IOMEM(addr)] != NULL)
+		{
+			ret = io_handler[IOMEM(addr)](IO_WRITE, IOMEM(addr), data);
+			if(ret == IO_ERR)
+				panic("?IO_ERR: WRITE addr = %hhx, data = %hhx", IOMEM(addr), data);
+		}
+
+		return ret;
 	}
 	else
 	{
@@ -95,6 +134,8 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 
 	mem_t inst = 0;
 
+	uint16_t alu_temp;
+
 	while(halt == 0)
 	{
 		switch(regs->cycle % 4)
@@ -102,17 +143,12 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 			case CYCL_LOAD_INST:
 				inst = mem[regs->p];
 				regs->i.iomem = BITVAL(mem[regs->p] & IOMEM_MASK);
-				regs->i.halt  = BITVAL(mem[regs->p] &  HALT_MASK);
+				regs->i.zp    = BITVAL(mem[regs->p] &    ZP_MASK);
 				regs->i.jump  = BITVAL(mem[regs->p] &  JUMP_MASK);
-				regs->i.jc    = BITVAL(mem[regs->p] &    JC_MASK);
+				regs->i.jcu   = BITVAL(mem[regs->p] &	JCU_MASK);
 				regs->i.alu   = GET_ALU(mem[regs->p]);
 				regs->i.ind   = BITVAL(mem[regs->p] &   IND_MASK);
 				regs->i.rw    = BITVAL(mem[regs->p++] &  RW_MASK);
-				if(regs->i.halt)
-				{
-					halt = 1;
-					dumpcore(mem, MEMSIZE, out);
-				}
 				break;
 			case CYCL_LOAD_EA:
 				regs->ea = mem[regs->p];
@@ -121,7 +157,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 				regs->p++; /* advance P first */
 				if(regs->i.jump)
 				{
-					if(regs->i.jc)
+					if(regs->i.jcu)
 					{
 						regs->p = regs->i.ind ? mem[regs->ea] : regs->ea;
 					}
@@ -139,17 +175,23 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 				{
 					if(regs->i.rw == 0)
 					{	/* Read */
-						regs->a = alu_calc(regs->i.alu, regs->a,
+						alu_temp = alu_calc(regs->i.alu, regs->a,
 								(state = readmem(regs->ea, mem, regs->i.iomem)));
-						if(state < 0)
-							panic("?READMEM");
+						regs->c = alu_temp >> 8; /* Update C value */
+
+						if(regs->i.jcu)
+							regs->u = (mem_t)alu_temp;
+						else
+							regs->a = (mem_t)alu_temp;
 					}
 					else
 					{	/* Write */
 						state = writemem(regs->ea, mem, regs->i.iomem, regs->a);
-						if(state < 0)
-							panic("?WRITEMEM");
 					}
+
+					if(state == IO_HALT)
+						halt = TRUE;
+
 				}
 				break;
 		}
