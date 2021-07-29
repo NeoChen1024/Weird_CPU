@@ -65,7 +65,8 @@ enum cpu_cycle
 	CYCL_LOAD_INST	= 0,
 	CYCL_LOAD_EA	= 1,
 	CYCL_IND_JMP	= 2,
-	CYCL_RW_IO	= 3
+	CYCL_RW_IO	= 3,
+	TOTAL_CYCLES	= 4
 };
 
 enum io_return
@@ -83,6 +84,8 @@ extern io_handler_t io_handler[IOMEMSIZE];
 
 #define DEF_IO_HANDLER(x) \
 	int io_ ## x(int rw, uint8_t addr, uint8_t data)
+
+#define _D_IO(x, addr) [addr] = io_ ## x
 
 void panic(char *fmt, ...);
 void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FILE *out);

@@ -80,6 +80,11 @@ DEF_IO_HANDLER(halt)
 	return IO_HALT;
 }
 
+io_handler_t io_handler[IOMEMSIZE] =
+{
+	_D_IO(halt, 0x00)
+};
+
 int readmem(pc_t addr, mem_t *mem, int iomem)
 {
 	int ret = 0;
@@ -138,7 +143,9 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 
 	while(halt == 0)
 	{
-		switch(regs->cycle % 4)
+		if(debug)
+			usleep(20000);
+		switch(regs->cycle % TOTAL_CYCLES)
 		{
 			case CYCL_LOAD_INST:
 				inst = mem[regs->p];
@@ -163,7 +170,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					}
 					else
 					{
-						if(!(regs->a & C_MASK)) /* Jump if C is not set */
+						if(!regs->c) /* Jump if C is not set */
 							regs->p = regs->i.ind ? mem[regs->ea] : regs->ea;
 					}
 				}
@@ -177,7 +184,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					{	/* Read */
 						alu_temp = alu_calc(regs->i.alu, regs->a,
 								(state = readmem(regs->ea, mem, regs->i.iomem)));
-						regs->c = alu_temp >> 8; /* Update C value */
+						regs->c = (state + regs->a) >> 8; /* Update C value */
 
 						if(regs->i.jcu)
 							regs->u = (mem_t)alu_temp;
@@ -198,8 +205,8 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 		
 		if(debug)
 		{
-			fprintf(stderr, ">> cycle %zu -> %zu, I = %02hhx A = %04hx, P = %02hhx, EA = %02hhx MEM[EA] = %02hhx\n",
-					regs->cycle, regs->cycle % 4, inst, regs->a, regs->p, regs->ea, mem[regs->ea]);
+			fprintf(stderr, ">> cycle %zu (%zu), I=%02hhx: A=%02hhx, U=%02hhx, C=%01hhx, MEM[PC = %04hx]=%02hhx, MEM[EA = %04hx]=%02hhx\n",
+					regs->cycle, regs->cycle % 4, inst, regs->a, regs->u, regs->c ? 1 : 0, regs->p, mem[regs->p], regs->ea, mem[regs->ea]);
 		}
 
 		regs->cycle++;
