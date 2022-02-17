@@ -44,7 +44,10 @@ void dumpcore(mem_t *mem, size_t memsize, FILE *fd)
 	for(ptr=0; ptr < memsize; ptr++)
 	{
 		if(ptr % 16 == 0)
+		{
 			putc('\n', fd);
+			fprintf(fd, "%04zx: ", ptr);
+		}
 		fprintf(fd, "%02hhx ", mem[ptr]);
 	}
 	putc('\n', fd);
@@ -80,9 +83,26 @@ DEF_IO_HANDLER(halt)
 	return IO_HALT;
 }
 
+DEF_IO_HANDLER(tty)
+{
+	int c;
+	if(rw == IO_READ)
+		c = getc(stdin);
+	else if(rw == IO_WRITE)
+		c = putc(data, stdout);
+
+	if(c == EOF)
+		return IO_NRDY;	/* I/O not ready */
+	else
+		return c;
+
+	return IO_ERR;
+}
+
 io_handler_t io_handler[IOMEMSIZE] =
 {
-	_D_IO(halt, 0x00)
+	_D_IO(halt, 0x00),
+	_D_IO(tty, 0xFF)
 };
 
 int readmem(pc_t addr, mem_t *mem, int iomem)
@@ -117,6 +137,9 @@ int writemem(pc_t addr, mem_t *mem, int iomem, mem_t data)
 			ret = io_handler[IOMEM(addr)](IO_WRITE, IOMEM(addr), data);
 			if(ret == IO_ERR)
 				panic("?IO_ERR: WRITE addr = %hhx, data = %hhx", IOMEM(addr), data);
+			else if(ret == IO_NRDY)
+			{
+			}
 		}
 
 		return ret;
@@ -194,6 +217,8 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					else
 					{	/* Write */
 						state = writemem(regs->ea, mem, regs->i.iomem, regs->a);
+						if(debug)
+							dumpcore(mem + (regs->ea & 0xFF00), PAGESIZE, stderr);
 					}
 
 					if(state == IO_HALT)

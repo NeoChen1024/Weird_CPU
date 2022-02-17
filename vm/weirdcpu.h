@@ -13,6 +13,7 @@
 
 #define IOMEMSIZE	(1<<8)
 #define MEMSIZE		(1<<16)
+#define PAGESIZE	(1<<8)
 
 typedef uint8_t mem_t;
 typedef uint16_t pc_t;
@@ -71,8 +72,9 @@ enum cpu_cycle
 
 enum io_return
 {
-	IO_HALT	= -1,
-	IO_ERR	= -2
+	IO_NRDY	= -1,
+	IO_HALT	= -2,
+	IO_ERR	= -3
 };
 
 #define IO_READ  0

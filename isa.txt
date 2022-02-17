@@ -52,7 +52,7 @@ Op-code format:
 	IOM:	Use I/O memory
 	Z:	if 1, Zero Page
 	J:	Type of instruction (Normal or Jump)
-	C/U:	Conditional Jump or select U register
+	C/U:	Unonditional Jump or select U register
 	ALU_F:	ALU Fuctions
 	I:	Indirect Access
 	R/W:	Read / Write to Memory

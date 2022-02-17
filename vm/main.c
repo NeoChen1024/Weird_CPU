@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	parsearg(argc, argv);
 
 	if(debug)
-		dumpcore(mem, MEMSIZE, stderr);
+		dumpcore(mem, PAGESIZE, stderr);
 
 	vm_mainloop(&regs, mem, 0, debug, stdin, stdout);
 
