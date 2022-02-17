@@ -410,7 +410,7 @@
     </comp>
     <comp lib="0" loc="(670,1080)" name="Tunnel">
       <a name="facing" val="south"/>
-      <a name="label" val="JMP_CONDITION"/>
+      <a name="label" val="JMP_UNCONDITIONAL"/>
     </comp>
     <comp lib="0" loc="(670,530)" name="Tunnel">
       <a name="label" val="ADDR"/>
@@ -467,7 +467,7 @@
       <a name="label" val="RD_U"/>
     </comp>
     <comp lib="0" loc="(730,840)" name="Tunnel">
-      <a name="label" val="JMP_CONDITION"/>
+      <a name="label" val="JMP_UNCONDITIONAL"/>
     </comp>
     <comp lib="0" loc="(780,1000)" name="Splitter">
       <a name="appear" val="right"/>
@@ -734,7 +734,7 @@
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="Simple I/O Devices"/>
     </comp>
-    <comp lib="8" loc="(982,783)" name="Text">
+    <comp lib="8" loc="(988,782)" name="Text">
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="Control Signal Generator / State Machine"/>
     </comp>
