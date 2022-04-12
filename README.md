@@ -14,8 +14,9 @@ There might be still some bugs floating around.
 * Memory-Mapped I/O (Separate Address)
 
 ## Todo:
-1. Emulator in C (WIP)
-2. Assembler
+1. Add OP decode ROM to make use of much wider control lines
+2. Emulator in C (WIP)
+3. Assembler
 
 # How does it looks like?
 ![The Circuit](https://github.com/NeoChen1024/Weird_CPU/raw/trunk/c.png)
