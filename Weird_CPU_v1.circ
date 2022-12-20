@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project source="3.7.2" version="1.0">
-  This file is intended to be loaded by Logisim-evolution v3.7.2(https://github.com/logisim-evolution/).
+<project source="3.8.0" version="1.0">
+  This file is intended to be loaded by Logisim-evolution v3.8.0(https://github.com/logisim-evolution/).
 
   <lib desc="#Wiring" name="0">
+    <tool name="Pin">
+      <a name="appearance" val="classic"/>
+    </tool>
     <tool name="Pull Resistor">
       <a name="pull" val="1"/>
     </tool>
@@ -100,7 +103,7 @@
     <comp lib="0" loc="(1050,960)" name="Tunnel">
       <a name="label" val="RD_EA"/>
     </comp>
-    <comp lib="0" loc="(1190,520)" name="Pull Resistor">
+    <comp lib="0" loc="(1190,510)" name="Pull Resistor">
       <a name="pull" val="1"/>
     </comp>
     <comp lib="0" loc="(120,1320)" name="Tunnel">
@@ -111,7 +114,7 @@
       <a name="facing" val="east"/>
       <a name="label" val="IOMEM"/>
     </comp>
-    <comp lib="0" loc="(1210,530)" name="Tunnel">
+    <comp lib="0" loc="(1220,520)" name="Tunnel">
       <a name="label" val="DATA"/>
       <a name="width" val="8"/>
     </comp>
@@ -228,6 +231,10 @@
       <a name="facing" val="north"/>
       <a name="label" val="P_UPDATE"/>
     </comp>
+    <comp lib="0" loc="(490,470)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="RD_EA"/>
+    </comp>
     <comp lib="0" loc="(490,510)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="CLK"/>
@@ -248,10 +255,6 @@
       <a name="facing" val="east"/>
       <a name="label" val="ALU_MUX"/>
       <a name="width" val="2"/>
-    </comp>
-    <comp lib="0" loc="(500,470)" name="Tunnel">
-      <a name="facing" val="east"/>
-      <a name="label" val="RD_EA"/>
     </comp>
     <comp lib="0" loc="(500,880)" name="Tunnel">
       <a name="facing" val="east"/>
@@ -533,10 +536,6 @@
       <a name="label" val="DATA"/>
       <a name="width" val="8"/>
     </comp>
-    <comp lib="0" loc="(930,100)" name="Tunnel">
-      <a name="label" val="DATA"/>
-      <a name="width" val="8"/>
-    </comp>
     <comp lib="0" loc="(930,1000)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="INDIRECT"/>
@@ -549,6 +548,10 @@
     <comp lib="0" loc="(930,970)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="JUMP_CYCLE"/>
+    </comp>
+    <comp lib="0" loc="(940,100)" name="Tunnel">
+      <a name="label" val="DATA"/>
+      <a name="width" val="8"/>
     </comp>
     <comp lib="0" loc="(940,890)" name="Tunnel">
       <a name="facing" val="east"/>
@@ -710,10 +713,10 @@
     <comp lib="4" loc="(940,440)" name="RAM">
       <a name="addrWidth" val="16"/>
       <a name="appearance" val="logisim_evolution"/>
+      <a name="asyncread" val="true"/>
       <a name="databus" val="bidir"/>
       <a name="label" val="MEM"/>
       <a name="labelvisible" val="true"/>
-      <a name="readbehav" val="war"/>
       <a name="trigger" val="falling"/>
       <a name="type" val="nonvolatile"/>
     </comp>
@@ -722,19 +725,19 @@
     <comp lib="5" loc="(390,1300)" name="Hex Digit Display"/>
     <comp lib="5" loc="(730,1350)" name="TTY"/>
     <comp lib="5" loc="(730,1520)" name="Keyboard"/>
-    <comp lib="8" loc="(1070,401)" name="Text">
+    <comp lib="8" loc="(1070,400)" name="Text">
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="Main Memory"/>
     </comp>
-    <comp lib="8" loc="(454,132)" name="Text">
+    <comp lib="8" loc="(450,130)" name="Text">
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="ALU &amp; Register Datapath"/>
     </comp>
-    <comp lib="8" loc="(588,1221)" name="Text">
+    <comp lib="8" loc="(585,1220)" name="Text">
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="Simple I/O Devices"/>
     </comp>
-    <comp lib="8" loc="(988,782)" name="Text">
+    <comp lib="8" loc="(985,780)" name="Text">
       <a name="font" val="URW Gothic plain 28"/>
       <a name="text" val="Control Signal Generator / State Machine"/>
     </comp>
@@ -750,8 +753,9 @@
     <wire from="(1040,890)" to="(1040,900)"/>
     <wire from="(1040,900)" to="(1050,900)"/>
     <wire from="(1040,960)" to="(1050,960)"/>
+    <wire from="(1190,510)" to="(1190,520)"/>
     <wire from="(1190,520)" to="(1190,530)"/>
-    <wire from="(1190,530)" to="(1210,530)"/>
+    <wire from="(1190,520)" to="(1220,520)"/>
     <wire from="(120,1320)" to="(130,1320)"/>
     <wire from="(120,1360)" to="(140,1360)"/>
     <wire from="(120,1420)" to="(130,1420)"/>
@@ -844,6 +848,7 @@
     <wire from="(450,630)" to="(490,630)"/>
     <wire from="(450,650)" to="(450,700)"/>
     <wire from="(450,650)" to="(490,650)"/>
+    <wire from="(490,470)" to="(500,470)"/>
     <wire from="(490,510)" to="(500,510)"/>
     <wire from="(50,390)" to="(90,390)"/>
     <wire from="(500,1470)" to="(510,1470)"/>
@@ -1034,7 +1039,7 @@
     <wire from="(910,110)" to="(910,120)"/>
     <wire from="(910,1560)" to="(920,1560)"/>
     <wire from="(910,550)" to="(930,550)"/>
-    <wire from="(920,100)" to="(930,100)"/>
+    <wire from="(920,100)" to="(940,100)"/>
     <wire from="(930,1000)" to="(940,1000)"/>
     <wire from="(930,430)" to="(940,430)"/>
     <wire from="(930,510)" to="(930,550)"/>
