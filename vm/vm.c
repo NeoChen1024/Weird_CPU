@@ -30,18 +30,18 @@ void debug_info(int debug, char *fmt, ...)
 	va_end(args);
 }
 
-pc_t readcore(mem_t *mem, size_t memsize, FILE *fd)
+addr_t readcore(mem_t *mem, size_t memsize, FILE *fd)
 {
 	size_t ptr=0;
 	while(fscanf(fd, "%hhx ", mem + (ptr++)) > 0 && ptr < memsize);
-	return (pc_t)ptr - 1;
+	return (addr_t)ptr - 1;
 }
 
-void dumpcore(mem_t *mem, size_t memsize, FILE *fd)
+void dumpcore(mem_t *mem, addr_t start_addr, addr_t size, FILE *fd)
 {
 	size_t ptr=0;
 	fputs("================== COREDUMP ===================", fd);
-	for(ptr=0; ptr < memsize; ptr++)
+	for(ptr = start_addr; ptr < start_addr + size; ptr++)
 	{
 		if(ptr % 16 == 0)
 		{
@@ -105,7 +105,7 @@ io_handler_t io_handler[IOMEMSIZE] =
 	_D_IO(tty, 0xFF)
 };
 
-int readmem(pc_t addr, mem_t *mem, int iomem)
+int readmem(addr_t addr, mem_t *mem, int iomem)
 {
 	int ret = 0;
 
@@ -126,7 +126,7 @@ int readmem(pc_t addr, mem_t *mem, int iomem)
 	}
 }
 
-int writemem(pc_t addr, mem_t *mem, int iomem, mem_t data)
+int writemem(addr_t addr, mem_t *mem, int iomem, mem_t data)
 {
 	int ret = 0;
 
@@ -151,7 +151,7 @@ int writemem(pc_t addr, mem_t *mem, int iomem, mem_t data)
 	return 0;
 }
 
-void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FILE *out)
+void vm_mainloop(regs_t *regs, mem_t *mem, addr_t startpc, int debug, FILE *in, FILE *out)
 {
 	int halt = 0;
 	int state = 0;
@@ -175,7 +175,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 				regs->i.iomem = BITVAL(mem[regs->p] & IOMEM_MASK);
 				regs->i.zp    = BITVAL(mem[regs->p] &    ZP_MASK);
 				regs->i.jump  = BITVAL(mem[regs->p] &  JUMP_MASK);
-				regs->i.jcu   = BITVAL(mem[regs->p] &	JCU_MASK);
+				regs->i.cu    = BITVAL(mem[regs->p] &	JCU_MASK);
 				regs->i.alu   = GET_ALU(mem[regs->p]);
 				regs->i.ind   = BITVAL(mem[regs->p] &   IND_MASK);
 				regs->i.rw    = BITVAL(mem[regs->p++] &  RW_MASK);
@@ -187,7 +187,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 				regs->p++; /* advance P first */
 				if(regs->i.jump)
 				{
-					if(regs->i.jcu)
+					if(regs->i.cu)
 					{
 						regs->p = regs->i.ind ? mem[regs->ea] : regs->ea;
 					}
@@ -209,7 +209,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 								(state = readmem(regs->ea, mem, regs->i.iomem)));
 						regs->c = (state + regs->a) >> 8; /* Update C value */
 
-						if(regs->i.jcu)
+						if(regs->i.cu)
 							regs->u = (mem_t)alu_temp;
 						else
 							regs->a = (mem_t)alu_temp;
@@ -218,7 +218,7 @@ void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FI
 					{	/* Write */
 						state = writemem(regs->ea, mem, regs->i.iomem, regs->a);
 						if(debug)
-							dumpcore(mem + (regs->ea & 0xFF00), PAGESIZE, stderr);
+							dumpcore(mem, (regs->ea & 0xFF00), PAGESIZE, stderr);
 					}
 
 					if(state == IO_HALT)

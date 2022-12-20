@@ -10,10 +10,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <weirdcpu.h>
+#include <getopt.h>
+#include "weirdcpu.h"
 
 mem_t *mem;
-pc_t pc = 0;
+addr_t pc = 0;
 int debug = 0;
 FILE *corefile = NULL;
 
@@ -62,7 +63,9 @@ int main(int argc, char **argv)
 	parsearg(argc, argv);
 
 	if(debug)
-		dumpcore(mem, PAGESIZE, stderr);
+	{
+		dumpcore(mem, 0, PAGESIZE, stderr);	// Dump 1st memory page
+	}
 
 	vm_mainloop(&regs, mem, 0, debug, stdin, stdout);
 

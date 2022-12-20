@@ -16,10 +16,10 @@
 #define PAGESIZE	(1<<8)
 
 typedef uint8_t mem_t;
-typedef uint16_t pc_t;
+typedef uint16_t addr_t;
 
 extern mem_t *mem;
-extern pc_t pc;
+extern addr_t pc;
 
 #define TRUE	-1
 #define FALSE	0
@@ -42,7 +42,7 @@ struct instruction_s
 	uint8_t iomem	:1;	/* Use I/O memory space */
 	uint8_t zp	:1;	/* Zero Page Addressing */
 	uint8_t jump	:1;	/* Perform jump */
-	uint8_t jcu	:1;	/* Unconditional Jump or select U register */
+	uint8_t cu	:1;	/* Unconditional Jump or select U register */
 	uint8_t alu	:2;	/* ALU functions */
 	uint8_t ind	:1;	/* Indirect addressing */
 	uint8_t rw	:1;	/* 0 -> Read / 1 -> Write */
@@ -54,8 +54,8 @@ typedef struct
 	uint8_t u;
 	uint8_t c;	/* Only use 1 bit */
 	struct instruction_s i;
-	pc_t p;
-	pc_t ea;
+	addr_t p;
+	addr_t ea;
 	size_t cycle; /* Total Cycle Count */
 	FILE *in;
 	FILE *out;
@@ -90,6 +90,6 @@ extern io_handler_t io_handler[IOMEMSIZE];
 #define _D_IO(x, addr) [addr] = io_ ## x
 
 void panic(char *fmt, ...);
-void vm_mainloop(regs_t *regs, mem_t *mem, pc_t startpc, int debug, FILE *in, FILE *out);
-pc_t readcore(mem_t *mem, size_t memsize, FILE *fd);
-void dumpcore(mem_t *mem, size_t memsize, FILE *fd);
+void vm_mainloop(regs_t *regs, mem_t *mem, addr_t startpc, int debug, FILE *in, FILE *out);
+addr_t readcore(mem_t *mem, size_t memsize, FILE *fd);
+void dumpcore(mem_t *mem, addr_t start_addr, addr_t size, FILE *fd);

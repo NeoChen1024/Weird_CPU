@@ -1,2 +1,3 @@
 vm/*.o
-vm/weirdcpu
+weirdcpu
+.vscode

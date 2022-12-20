@@ -1,6 +1,6 @@
 CC=	cc
 CFLAGS=	-O3 -g3 -gdwarf-5 -pipe -Wall -Wextra -I. -std=c99 -pedantic -D_DEFAULT_SOURCE
-VMOBJS=	vm.o main.o
+VMOBJS=	vm/vm.o vm/main.o
 EXEC=	weirdcpu
 .PHONY: all clean syntax countline
 all:	$(EXEC)
