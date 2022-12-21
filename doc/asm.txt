@@ -3,15 +3,30 @@ Weird CPU assembler syntax
 
 every field in a line is tab-separated
 
+types:
+	c	comment
+	asm	assembler commands
+	i	instruction
+	lb	label
+	eq	value definition
+	db	data byte
+
+operand prefixes:
+	$	Raw Hex Data
+	@	Indirect
+	%	U mode
+	&	U indirect
+	=	I/O mode
+
 type	symbol	operand	comment
 ==================================================
 c	Comment
-asm     org     $0000	Origin Address
+asm	org	$0000	Origin Address
 i	r	one	Read from "one"
 lb	loop0		Label "loop0"
 i	add	one
-i	wr	DISP	Write to hex display
+i	wr	=DISP	Write to hex display
 i	jcu	loop0
-i	hlt
+i	wr	=HALT
 db	one	$01
 ==================================================

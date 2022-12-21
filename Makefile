@@ -1,17 +1,22 @@
 CC=	cc
-CFLAGS=	-O3 -g3 -gdwarf-5 -pipe -Wall -Wextra -I. -std=c99 -pedantic -D_DEFAULT_SOURCE
-VMOBJS=	vm/vm.o vm/main.o
-EXEC=	weirdcpu
+CFLAGS=	-O2 -g3 -pipe -Wall -Wextra -Ivm -Iasm -std=c11 -pedantic -D_DEFAULT_SOURCE -Wno-unused-parameter
+COMMONS=	vm/vm.o asm/symtab.o
+VMOBJS=		vm/main.o $(COMMONS)
+ASMOBJS=	asm/asm.o $(COMMONS)
+EXEC=	weirdcpu weirdasm
 .PHONY: all clean syntax countline
 all:	$(EXEC)
 weirdcpu:	$(VMOBJS)
-	$(CC) $(LDFLAGS) $^ $(.ALLSRC) -o weirdcpu
+	$(CC) $(CFLAGS) $^ -o $@
+
+weirdasm:	$(ASMOBJS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -rf $(VMOBJS) $(EXEC)
+	rm -rf $(VMOBJS) $(ASMOBJS) $(EXEC)
 
 syntax:
-	$(CC) $(CFLAGS) -fsyntax-only *.c *.h
+	$(CC) $(CFLAGS) -fsyntax-only */*.c */*.h
 
 countline:
-	wc -l *.c *.h *.l
+	wc -l **/*.c **/*.h
