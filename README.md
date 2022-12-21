@@ -17,8 +17,8 @@ There might be still some bugs floating around.
 
 ## Todo:
 
-1. Emulator in C (WIP)
-2. Assembler (WIP too)
+1. Update Emulator code to reflect the changes in Logisim-Evolution circuit
+2. Enhance & clean-up the assembler
 
 # How does it looks like?
 
