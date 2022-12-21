@@ -11,15 +11,14 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#ifndef WEIRDCPU_H
+
 #define IOMEMSIZE	(1<<8)
 #define MEMSIZE		(1<<16)
 #define PAGESIZE	(1<<8)
 
 typedef uint8_t mem_t;
 typedef uint16_t addr_t;
-
-extern mem_t *mem;
-extern addr_t pc;
 
 #define TRUE	-1
 #define FALSE	0
@@ -93,3 +92,6 @@ void panic(char *fmt, ...);
 void vm_mainloop(regs_t *regs, mem_t *mem, addr_t startpc, int debug, FILE *in, FILE *out);
 addr_t readcore(mem_t *mem, size_t memsize, FILE *fd);
 void dumpcore(mem_t *mem, addr_t start_addr, addr_t size, FILE *fd);
+
+#define WEIRDCPU_H
+#endif

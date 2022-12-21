@@ -40,7 +40,6 @@ addr_t readcore(mem_t *mem, size_t memsize, FILE *fd)
 void dumpcore(mem_t *mem, addr_t start_addr, addr_t size, FILE *fd)
 {
 	size_t ptr=0;
-	fputs("================== COREDUMP ===================", fd);
 	for(ptr = start_addr; ptr < start_addr + size; ptr++)
 	{
 		if(ptr % 16 == 0)
@@ -51,7 +50,6 @@ void dumpcore(mem_t *mem, addr_t start_addr, addr_t size, FILE *fd)
 		fprintf(fd, "%02hhx ", mem[ptr]);
 	}
 	putc('\n', fd);
-	fputs("=============== END OF COREDUMP ===============\n", fd);
 }
 
 /* a should be A register value */
@@ -85,7 +83,7 @@ DEF_IO_HANDLER(halt)
 
 DEF_IO_HANDLER(tty)
 {
-	int c;
+	int c = EOF;
 	if(rw == IO_READ)
 		c = getc(stdin);
 	else if(rw == IO_WRITE)

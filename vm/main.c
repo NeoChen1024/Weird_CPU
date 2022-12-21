@@ -1,8 +1,8 @@
 /* ========= *\
-|| NeoSUBLEQ ||
+|| Weird CPU ||
 \* ========= */
 
-/* subleq.c: Virtual Machine */
+/* The Weird CPU Virtual Machine */
 
 #include <signal.h>
 #include <pthread.h>

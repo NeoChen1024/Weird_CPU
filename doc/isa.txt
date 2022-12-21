@@ -28,7 +28,6 @@ Instruction: (and opcodes)
 	WR:	Write to Memory		0x01
 	JP:	Unconditional Jump	0x30
 	JC:	Jump if C isn't set	0x20
-	HLT:	Halt			0x80 0x00
 
 	...etc, there're many more combinations that have potiential use.
 
@@ -60,25 +59,27 @@ Op-code format:
 Addressing Mode:
 
 (PH = P & 0xFF00)
+(UH = U << 8)
 
-+-------+-------+-------+-----------------------------------------------+
-|J	|Z	|I	|Actual Effect					|
-+-------+-------+-------+-----------------------------------------------+
-|X	|X	|X	|EA <-	PH + ADDR				|
-|X	|X	|O	|EA <-	PH + MEM(PH + ADDR)			|
-|X	|O	|X	|EA <-	0 + ADDR)				|
-|X	|O	|O	|EA <-	0 + MEM(PH + ADDR)			|
-|O	|X	|X	|P <-	PH + ADDR				|
-|O	|X	|O	|P <-	PH + MEM(PH + ADDR)			|
-|O	|O	|X	|P <-	0 + ADDR)				|
-|O	|O	|O	|P <-	0 + MEM(PH + ADDR)			|
-+-------+-------+-------+-----------------------------------------------+
++-------+-------+-------+-------------------------------+
+|Z	|U	|I	|Effective Address (EA or P)	|
++-------+-------+-------+-------------------------------+
+|_	|_	|_	| PH + ADDR			|
+|_	|_	|V	| PH + MEM(PH + ADDR)		|
+|_	|V	|_	| PH + ADDR			|
+|_	|V	|V	| UH + MEM(PH + ADDR)		|
+|V	|_	|_	| 00 + ADDR			|
+|V	|_	|V	| PH + MEM(00 + ADDR)		|
+|V	|V	|_	| 00 + ADDR			|
+|V	|V	|V	| UH + MEM(00 + ADDR)		|
++-------+-------+-------+-------------------------------+
 
 Standard I/O devices:
 
 +---------------+-------------------------------------------------------+
 | I/O Address   | Name							|
 +---------------+-------------------------------------------------------+
+| 0x00	(HALT)	| Halt
 | 0xFD	(DISP)	| 8bit hex display					|
 | 0xFE	(KBD)	| 7bit ASCII keyboard					|
 | 0xFF	(PRT)	| 7bit ASCII terminal (MSB is special function)		|
