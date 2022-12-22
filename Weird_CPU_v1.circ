@@ -233,7 +233,7 @@
     <comp lib="0" loc="(350,890)" name="Tunnel">
       <a name="label" val="JUMP_CYCLE"/>
     </comp>
-    <comp lib="0" loc="(360,1340)" name="Splitter">
+    <comp lib="0" loc="(360,1330)" name="Splitter">
       <a name="appear" val="right"/>
       <a name="bit1" val="0"/>
       <a name="bit2" val="0"/>
@@ -724,6 +724,7 @@
     </comp>
     <comp lib="4" loc="(240,300)" name="Register">
       <a name="appearance" val="logisim_evolution"/>
+      <a name="label" val="I"/>
     </comp>
     <comp lib="4" loc="(270,1310)" name="Register">
       <a name="appearance" val="logisim_evolution"/>
@@ -767,14 +768,13 @@
       <a name="databus" val="bidir"/>
       <a name="label" val="MEM"/>
       <a name="labelvisible" val="true"/>
-      <a name="trigger" val="falling"/>
       <a name="type" val="nonvolatile"/>
     </comp>
     <comp lib="5" loc="(30,240)" name="Button"/>
-    <comp lib="5" loc="(350,1300)" name="Hex Digit Display">
+    <comp lib="5" loc="(350,1290)" name="Hex Digit Display">
       <a name="labelvisible" val="true"/>
     </comp>
-    <comp lib="5" loc="(390,1300)" name="Hex Digit Display">
+    <comp lib="5" loc="(390,1290)" name="Hex Digit Display">
       <a name="labelvisible" val="true"/>
     </comp>
     <comp lib="5" loc="(730,1350)" name="TTY"/>
@@ -841,7 +841,10 @@
     <wire from="(150,420)" to="(240,420)"/>
     <wire from="(170,440)" to="(200,440)"/>
     <wire from="(170,470)" to="(210,470)"/>
-    <wire from="(190,1360)" to="(270,1360)"/>
+    <wire from="(190,1360)" to="(200,1360)"/>
+    <wire from="(200,1300)" to="(200,1360)"/>
+    <wire from="(200,1300)" to="(370,1300)"/>
+    <wire from="(200,1360)" to="(270,1360)"/>
     <wire from="(200,440)" to="(200,450)"/>
     <wire from="(200,450)" to="(210,450)"/>
     <wire from="(210,230)" to="(220,230)"/>
@@ -893,17 +896,21 @@
     <wire from="(340,320)" to="(360,320)"/>
     <wire from="(340,690)" to="(340,700)"/>
     <wire from="(340,890)" to="(350,890)"/>
-    <wire from="(350,1300)" to="(350,1320)"/>
-    <wire from="(350,1320)" to="(370,1320)"/>
+    <wire from="(350,1290)" to="(350,1310)"/>
+    <wire from="(350,1310)" to="(370,1310)"/>
     <wire from="(350,570)" to="(350,610)"/>
     <wire from="(350,570)" to="(590,570)"/>
     <wire from="(350,610)" to="(370,610)"/>
+    <wire from="(360,1330)" to="(360,1340)"/>
     <wire from="(360,630)" to="(370,630)"/>
     <wire from="(360,670)" to="(430,670)"/>
-    <wire from="(380,1320)" to="(390,1320)"/>
+    <wire from="(370,1290)" to="(370,1300)"/>
+    <wire from="(370,1300)" to="(410,1300)"/>
+    <wire from="(380,1310)" to="(390,1310)"/>
     <wire from="(380,170)" to="(380,200)"/>
-    <wire from="(380,240)" to="(530,240)"/>
-    <wire from="(390,1300)" to="(390,1320)"/>
+    <wire from="(380,240)" to="(380,250)"/>
+    <wire from="(380,250)" to="(540,250)"/>
+    <wire from="(390,1290)" to="(390,1310)"/>
     <wire from="(390,320)" to="(410,320)"/>
     <wire from="(390,450)" to="(390,530)"/>
     <wire from="(390,450)" to="(500,450)"/>
@@ -912,6 +919,7 @@
     <wire from="(400,280)" to="(550,280)"/>
     <wire from="(400,390)" to="(400,420)"/>
     <wire from="(400,390)" to="(670,390)"/>
+    <wire from="(410,1290)" to="(410,1300)"/>
     <wire from="(410,290)" to="(410,320)"/>
     <wire from="(410,290)" to="(550,290)"/>
     <wire from="(410,620)" to="(450,620)"/>
@@ -934,8 +942,6 @@
     <wire from="(510,1460)" to="(520,1460)"/>
     <wire from="(520,220)" to="(520,270)"/>
     <wire from="(520,270)" to="(550,270)"/>
-    <wire from="(530,210)" to="(530,240)"/>
-    <wire from="(530,210)" to="(820,210)"/>
     <wire from="(530,780)" to="(530,800)"/>
     <wire from="(530,780)" to="(540,780)"/>
     <wire from="(530,810)" to="(600,810)"/>
@@ -946,6 +952,8 @@
     <wire from="(530,860)" to="(540,860)"/>
     <wire from="(530,870)" to="(530,880)"/>
     <wire from="(530,880)" to="(610,880)"/>
+    <wire from="(540,210)" to="(540,250)"/>
+    <wire from="(540,210)" to="(820,210)"/>
     <wire from="(540,860)" to="(540,870)"/>
     <wire from="(540,870)" to="(660,870)"/>
     <wire from="(550,690)" to="(550,700)"/>
