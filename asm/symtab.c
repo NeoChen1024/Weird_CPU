@@ -7,8 +7,8 @@
 
 const struct symbol_s reserved_symbols[] =
 {
-	{"HALT",	SYM_ADDR_LABEL, 0x00},
-	{"DISP",	SYM_ADDR_LABEL, 0xFD},
+	{"HALT",	SYM_LABEL, 0x00},
+	{"DISP",	SYM_LABEL, 0xFD},
 	{"rd",		SYM_VALUE, 0x00},
 	{"add",		SYM_VALUE, 0x04},
 	{"nand",	SYM_VALUE, 0x08},
@@ -56,9 +56,9 @@ int symbol_add(char *name, enum symbol_types type, addr_t data)
 	// First use initialization
 	if(user_symbols == NULL)
 	{
-		user_symbols_alloc = 5;
+		user_symbols_alloc = 8;
 		user_symbols_size = 0;
-		user_symbols = calloc(user_symbols_alloc, sizeof(user_symbols));
+		user_symbols = calloc(user_symbols_alloc, sizeof(struct symbol_s));
 		assert(user_symbols != NULL);
 	}
 
@@ -71,7 +71,7 @@ int symbol_add(char *name, enum symbol_types type, addr_t data)
 	if(user_symbols_size >= user_symbols_alloc)
 	{
 		printf("Symbol table out of space, current size: %zd\n", user_symbols_size);
-		user_symbols = reallocarray(user_symbols, user_symbols_alloc *= 2, sizeof(struct symbol_s));
+		user_symbols = reallocarray(user_symbols, user_symbols_alloc += 1024, sizeof(struct symbol_s));
 		assert(user_symbols != NULL);
 	}
 	
@@ -84,7 +84,7 @@ void symbol_dump(void)
 	for(size_t i = 0; i < user_symbols_size; i++)
 	{
 		printf("%s\t== (%s)\t%#hx\n", user_symbols[i].symbol,
-			user_symbols[i].type == SYM_ADDR_LABEL ? "label" : "value",
+			user_symbols[i].type == SYM_LABEL ? "label" : "value",
 			user_symbols[i].data);
 	}
 }

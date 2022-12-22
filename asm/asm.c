@@ -8,6 +8,8 @@ FILE *corefile;
 int debug = 0;
 char line[PATH_MAX];
 
+addr_t last_address = 0; // This tracks the last address used by the assembler
+
 struct parsed_line_s
 {
 	enum line_types type;
@@ -70,10 +72,13 @@ addr_t argparse(char *arg)
 {
 	addr_t ret = 0;
 
+	// Try to parse as hex first
 	if(str2hexbyte(arg, &ret))
 	{
 		return ret;
 	}
+
+	// Check if prefix exists
 	if(isprefixes(arg[0]))
 	{
 		arg++;
@@ -82,7 +87,7 @@ addr_t argparse(char *arg)
 	{
 		return ret;
 	}
-	else if(symbol_find(arg, SYM_ADDR_LABEL, &ret))
+	else if(symbol_find(arg, SYM_LABEL, &ret))
 	{
 		return ret;
 	}
@@ -103,7 +108,7 @@ void emit_inst(mem_t *mem, addr_t current_address, struct parsed_line_s *line)
 
 	if(!symbol_find(line->op, SYM_VALUE, &op))
 	{
-		panic("Invalid instruction \"%s\"\n", line->op);
+		panic("Invalid instruction \"%s\", %s\n", line->op, line->arg);
 	}
 
 	switch(line->arg[0])
@@ -132,7 +137,7 @@ void emit_inst(mem_t *mem, addr_t current_address, struct parsed_line_s *line)
 	}
 	else
 	{
-		if((current_address & 0xff00) != (arg & 0xff00))
+		if((current_address & 0xff00) != (arg & 0xff00)) // Page boundary crossed
 		{
 			if((arg >> 8) == 0 && (op & IOMEM_MASK) == 0)
 			{
@@ -172,23 +177,28 @@ int first_pass(struct parsed_line_s *line)
 		case TYPE_COMMENT:
 			break;
 		case TYPE_ASM:
+			asm_handler(line, &current_address);
 			break;
 		case TYPE_INST:
 			current_address+=2;
 			break;
 		case TYPE_LABEL:
 			printf("Label: %#hx (%s)\n", current_address, line->op);
-			symbol_add(line->op, SYM_ADDR_LABEL, current_address);
+			symbol_add(line->op, SYM_LABEL, current_address);
 			break;
 		case TYPE_EQ:
 			symbol_add(line->op, SYM_VALUE, argparse(line->arg));
 			break;
 		case TYPE_DATA:
 			printf("Data: %#hx (%s)\n", current_address, line->op);
-			symbol_add(line->op, SYM_ADDR_LABEL, current_address);
+			symbol_add(line->op, SYM_LABEL, current_address);
 			current_address+=1;
 			break;
 	}
+
+	if(current_address >= last_address)
+		last_address = current_address;
+
 	return TRUE;
 }
 
@@ -201,6 +211,7 @@ int second_pass(struct parsed_line_s *line)
 		case TYPE_COMMENT:
 			break;
 		case TYPE_ASM:
+			asm_handler(line, &current_address);
 			break;
 		case TYPE_INST:
 			emit_inst(&mem[current_address], current_address, line);
@@ -215,6 +226,10 @@ int second_pass(struct parsed_line_s *line)
 			current_address+=1;
 			break;
 	}
+
+	if(current_address >= last_address)
+		last_address = current_address;
+
 	return TRUE;
 }
 
@@ -275,10 +290,10 @@ int main(int argc, char **argv)
 	while(fgets(line, PATH_MAX, srcfile) != NULL)
 	{
 		parsed_lines[parsed_lines_size] = parseline(line);
-		printf("%s,\t%s,\t%s\n", line_types_str[parsed_lines[parsed_lines_size].type],
-			parsed_lines[parsed_lines_size].op, parsed_lines[parsed_lines_size].arg);
 
-		first_pass(&parsed_lines[parsed_lines_size++]);
+		first_pass(&parsed_lines[parsed_lines_size]);
+
+		parsed_lines_size++;
 
 		if(parsed_lines_size >= parsed_lines_alloc)
 		{
@@ -292,8 +307,10 @@ int main(int argc, char **argv)
 		second_pass(&parsed_lines[i]);
 	}
 
-	dumpcore(mem, 0, PAGESIZE, corefile);
+	dumpcore(mem, 0, last_address, corefile);
 
+	puts("====== SYMBOLS ======");
 	symbol_dump();
+
 	return 0;
 }

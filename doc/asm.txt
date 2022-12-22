@@ -11,6 +11,9 @@ types:
 	eq	value definition
 	db	data byte
 
+valid assembler command:
+	org	origin address
+
 operand prefixes:
 	$	Raw Hex Data
 	@	Indirect

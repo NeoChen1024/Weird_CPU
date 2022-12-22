@@ -35,7 +35,8 @@ static const char line_types_str[MAX_TYPES][MAX_SYM_LEN+1] =
 
 enum symbol_types
 {
-	SYM_ADDR_LABEL,
+	SYM_NONE = 0,
+	SYM_LABEL,
 	SYM_VALUE
 };
 
